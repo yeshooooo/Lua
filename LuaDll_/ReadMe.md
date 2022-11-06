@@ -1,0 +1,3 @@
+# 配置luaconf.h中可以看到需要指定宏
+
+在使用LuaDll_生成的库时候,需要添加LUA_CORE或者LUA_LIB宏
