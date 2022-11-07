@@ -21,5 +21,5 @@ end
 
 function Test1(a,b)
     print("Test1", a,b);
-    return 1,2,"Hello";
+    return a + b;
 end

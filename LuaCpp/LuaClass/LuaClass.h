@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <stdexcept>
 #include "lua.hpp"
 class LuaClass
 {
@@ -45,7 +46,8 @@ public:
 	int LuaGet<int>(int index) {
 		if (!LuaCheck<int>(index))
 		{
-			std::cout << "err check, 检查失败" << std::endl;
+			//std::cout << "err check, 检查失败" << std::endl;
+			throw std::logic_error("erro check!");
 		}
 		return lua_tonumber(m_lua, index);
 	}
@@ -212,6 +214,123 @@ public:
 		}
 		return true;
 
+	}
+
+///// <summary>
+///// 调用Lua函数模板
+///// 	c++11 中只能用递归遍历参数列表
+///// </summary>
+///// 		template<typename _FirstArg, typename... _Args>
+//#if 0
+//	inline void CallLua(int& argSize) // 压入无参数
+//	{
+//		std::cout << "void" << std::endl;
+//	}
+//
+//
+//	template<typename _FirstArg, typename... _Args>
+//	void CallLua(int& argSize,_FirstArg arg1, _Args...args) // 压入参数
+//	{
+//		argSize++;
+//		LuaPush<_FirstArg>(arg1);
+//		
+//		CallLua(argSize ,args...);
+//	}
+//
+//
+//	template<typename _Ret,typename... _Args>
+//	_Ret CallLuaFunction(char* FunctionName, _Args...args)
+//	{
+//		_Ret t;
+//		if (GetGlobal(FunctionName))
+//		{
+//			int argSize = 0; // 参数格式
+//			CallLua(argSize,args...);
+//			if (lua_pcall(m_lua, argSize, 1, 0) != 0)
+//			{
+//				lua_pop(GetLuaState(), 1); //弹出错误值
+//				/*PrintStack("lua_pcall erro");*/
+//				throw std::logic_error("lua_pcall erro"); //抛出异常
+//			}
+//			t = LuaGet<_Ret>();
+//			//if (_pop)
+//			//{
+//			//	lua_pop(m_lua, 1);
+//			//}
+//			_Ret t = LuaGet<_Ret>();
+//			return t;
+//		}
+//		return _Ret();
+//
+//	}
+//
+//#endif
+	////////////////////////////////调用Lua函数模板//////////////////////////////////////////
+
+	inline void CallLua(int& argSize)//压入无参数
+	{
+		std::cout << "VOID" << std::endl;
+	}
+
+	template<typename _FirstArg, typename... _Args>
+	void CallLua(int& argSize, _FirstArg arg1, _Args...args)//压入参数
+	{
+		std::cout << "push" << std::endl;
+		argSize++;
+		LuaPush<_FirstArg>(arg1);
+		CallLua(argSize, args...);
+	}
+
+	template<typename _Ret, typename... _Args>
+	_Ret CallLuaFunction(char* FunctionName, _Args...args)
+	{
+
+		if (GetGlobal(FunctionName))
+		{
+			int argSize = 0;//参数个数
+			CallLua(argSize, args...);
+			PrintStack();
+			std::cout << "参数个数:" << argSize << std::endl;
+			if (lua_pcall(m_lua, argSize, 1, 0) != 0)
+			{
+				lua_pop(GetLuaState(), 1);//弹出错误值 
+				throw std::logic_error("lua_pcall erro");
+			}
+			_Ret t = LuaGet<_Ret>();
+			return t;
+
+		}
+
+
+
+		return _Ret();
+	}
+
+
+	template<typename _Ret, typename... _Args>
+	_Ret CallLuaFuctionPop(char* FunctionName, _Args...args)
+	{
+		if (GetGlobal(FunctionName))
+		{
+			int argSize = 0;//参数个数
+			CallLua(argSize, args...);
+			PrintStack();
+			cout << "参数个数:" << argSize << endl;
+			if (lua_pcall(m_lua, argSize, 1, 0) != 0)
+			{
+				lua_pop(GetLuaState(), 1);//弹出错误值 
+				throw std::logic_error("lua_pcall erro");
+			}
+			_Ret t = LuaGet<_Ret>();
+			lua_pop(m_lua, 1);
+			return t;
+
+
+		}
+
+
+
+		return _Ret();
 	}
 public:
 	inline lua_State* LuaClass::GetLuaState()

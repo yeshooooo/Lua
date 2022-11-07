@@ -36,6 +36,7 @@ int a____() {
 }
 #include "TestLua_1.h"
 
+#if 0
 template<typename Ty>
 Ty mget();
 
@@ -59,6 +60,7 @@ inline void MyPrint( char* arg) {
 
 inline void MyPrint()
 {
+	// va_list 其实就是char*
 	std::cout << "void" << std::endl;
 }
 
@@ -70,9 +72,10 @@ inline void MyPrint(int& callCount, First f, _Args...args)
 	MyPrint(f);
 	MyPrint(callCount ,args...); // 递归调用自己
 }
+#endif
 
 // 这种方式在有返回值的上层函数中使用，因为递归调用中不能有返回值
-#if 1
+#if 0
 template<typename _Ret,typename... _Args>
 inline _Ret Call_Print(_Args...args)
 {
@@ -94,10 +97,10 @@ inline void Call_Print(_Args...args)
 	MyPrint(args...);
 }
 #endif
-int main()
+int main_1()
 {
-	auto ret = Call_Print<char*>(1, 2, 3);
-	std::cout << "ret: " << ret << std::endl;
+	//auto ret = Call_Print<char*>(1, 2, 3);
+	//std::cout << "ret: " << ret << std::endl;
 	//LuaClass* mclass = new LuaClass();
 	//if (mclass->CreateLuaState() == false)
 	//{
@@ -123,4 +126,14 @@ int main()
 	//Call_Print(1, 2, (char*)"11");
 	return 0;
 
+}
+
+int main() {
+	TestLua_1* mclass = new TestLua_1();
+	if (mclass->CreateLuaState())
+	{
+		mclass->dofile("./ex3/ex5.lua");
+		int ret =  mclass->CallLuaFunction<int>("Test1",1, 9);
+		std::cout << "Lua return: " << ret << std::endl;
+	}
 }
