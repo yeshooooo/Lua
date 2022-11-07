@@ -26,15 +26,15 @@ void TestLua_1::Test()
 			PrintStack(s);
 
 			
-			if (lua_pcall(m_lua, 2, -1, 0) != 0)
+			if (lua_pcall(GetLuaState(), 2, -1, 0) != 0)
 			{
-				lua_pop(m_lua, 1); // 弹出错误值
+				lua_pop(GetLuaState(), 1); // 弹出错误值
 				PrintStack("lua_pcall erro");
 				return;
 			}
 			PrintStack("lua_pcall end");
 			std::cout << LuaGet<int>(1) << "," << LuaGet<int>(2) << "," << LuaGet<char*>(3) << std::endl;
-			lua_pop(m_lua, 3);
+			lua_pop(GetLuaState(), 3);
 			PrintStack("end");
 		}
 		

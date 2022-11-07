@@ -24,7 +24,7 @@ public:
 	_Ty LuaGet(int index = -1);
 
 	// 特化字符串类型
-	template<>
+	template<> inline
 	char* LuaGet<char*>(int index) {
 		if (!LuaCheck<char*>(index))
 		{
@@ -32,7 +32,7 @@ public:
 		}
 		return (char*)lua_tostring(m_lua, index);
 	}
-	template<>
+	template<> inline
 	std::string LuaGet<std::string>(int index) {
 		if (!LuaCheck<std::string>(index))
 		{
@@ -41,7 +41,7 @@ public:
 		std::string tmpstr = (char*)lua_tostring(m_lua, index);
 		return std::move(tmpstr);
 	}
-	template<>
+	template<> inline
 	int LuaGet<int>(int index) {
 		if (!LuaCheck<int>(index))
 		{
@@ -49,7 +49,7 @@ public:
 		}
 		return lua_tonumber(m_lua, index);
 	}
-	template<>
+	template<> inline
 	double LuaGet<double>(int index) {
 		if (!LuaCheck<double>(index))
 		{
@@ -108,11 +108,9 @@ public:
 		{
 			std::cout << "erro check! 获取全局变量 :" << global << "失败" << std::endl;
 		}
-		if (!LuaCheck<char*>())
-		{
-			std::cout << "err check, 检查失败" << std::endl;
-		}
-		char* tmp = (char*)lua_tostring(m_lua, -1);
+
+		char* tmp =  LuaGet<char*>();
+		//char* tmp = (char*)lua_tostring(m_lua, -1);
 
 		if (_pop)
 		{
@@ -128,17 +126,14 @@ public:
 		{
 			std::cout << "erro check! 获取全局变量 :" << global << "失败" << std::endl;
 		}
-		if (!LuaCheck<std::string>())
-		{
-			std::cout << "err check, 检查失败" << std::endl;
-		}
-		std::string tmpstr = (char*)lua_tostring(m_lua, -1);
+
+		std::string tmp = LuaGet<std::string>();
 
 		if (_pop)
 		{
 			lua_pop(m_lua, 1);
 		} 
-		return std::move(tmpstr);
+		return std::move(tmp);
 	}
 	template<>
 	int LuaGetGlobal<int>(const char* global, bool _pop) {
@@ -146,11 +141,8 @@ public:
 		{
 			std::cout << "erro check! 获取全局变量 :" << global << "失败" << std::endl;
 		}
-		if (!LuaCheck<int>())
-		{
-			std::cout << "err check, 检查失败" << std::endl;
-		}
-		int tmp = lua_tonumber(m_lua, -1);
+
+		int tmp = LuaGet<int>();
 		if (_pop)
 		{
 			lua_pop(m_lua, 1);
@@ -163,11 +155,8 @@ public:
 		{
 			std::cout << "erro check! 获取全局变量 :" << global << "失败" << std::endl;
 		}
-		if (!LuaCheck<double>())
-		{
-			std::cout << "err check, 检查失败" << std::endl;
-		}
-		double tmp =  lua_tonumber(m_lua, -1);
+
+		double tmp =  LuaGet<double>();
 		if (_pop)
 		{
 			lua_pop(m_lua, 1);
@@ -225,9 +214,13 @@ public:
 
 	}
 public:
+	inline lua_State* LuaClass::GetLuaState()
+	{
+		return m_lua;
+	}
 	// 为了方便测试,变为共有的
-	lua_State* m_lua;
+	//lua_State* m_lua;
 private:
-//	lua_State* m_lua;
+	lua_State* m_lua;
 };
 

@@ -35,8 +35,69 @@ int a____() {
 	return 0;
 }
 #include "TestLua_1.h"
+
+template<typename Ty>
+Ty mget();
+
+template<> inline
+int mget<int>() {
+	
+	return 888; //这里为了方便每次返回888
+}
+template<> inline	
+char*  mget<char*>() {
+	return "Hello";
+}
+inline void MyPrint(int arg)
+{
+	std::cout << arg << std::endl;
+}
+inline void MyPrint( char* arg) {
+	std::cout << " char* :" << std::endl;
+	std::cout << arg << std::endl;
+}
+
+inline void MyPrint()
+{
+	std::cout << "void" << std::endl;
+}
+
+template<typename First, typename... _Args>
+inline void MyPrint(int& callCount, First f, _Args...args)
+{
+	std::cout << __FUNCDNAME__ << std::endl;
+	callCount++;
+	MyPrint(f);
+	MyPrint(callCount ,args...); // 递归调用自己
+}
+
+// 这种方式在有返回值的上层函数中使用，因为递归调用中不能有返回值
+#if 1
+template<typename _Ret,typename... _Args>
+inline _Ret Call_Print(_Args...args)
+{
+	std::cout << "Call_Print" << std::endl;
+	int callCount = 0;
+	MyPrint(callCount,args...);
+	std::cout << "callCount: " << callCount << std::endl;
+	_Ret rt;
+	rt = mget<_Ret>();
+
+	return rt;
+}
+#endif
+#if 0
+template< typename... _Args>
+inline void Call_Print(_Args...args)
+{
+	std::cout << "Call_Print" << std::endl;
+	MyPrint(args...);
+}
+#endif
 int main()
 {
+	auto ret = Call_Print<char*>(1, 2, 3);
+	std::cout << "ret: " << ret << std::endl;
 	//LuaClass* mclass = new LuaClass();
 	//if (mclass->CreateLuaState() == false)
 	//{
@@ -55,8 +116,11 @@ int main()
 	//std::cout << luaL_tolstring(mclass->m_lua, -1, NULL) << std::endl;
 	//mclass->PrintStackSize();
 	
-	TestLua_1* mclass = new TestLua_1();
-	mclass->Test();
+	//TestLua_1* mclass = new TestLua_1();
+	//mclass->Test();
+	//MyPrint(1, 2, 3);
+	//MyPrint();
+	//Call_Print(1, 2, (char*)"11");
 	return 0;
 
 }
