@@ -77,8 +77,17 @@ lua_tonumber,lua_tostring这种不会改变堆栈
 # C++调用Lua函数及调用注意事项 lua_pcall
 lua_pcall的参数影响堆栈,以及是否正确调用,需要注意!
 ![Lua Pcall2](notepic/lua_pcall2.png)
+
 ----
 
+## C++ 调用Lua函数-变长参数模板和返回值
+* 变长参数模板
+```cpp
+template<typename..._Args>
+Function(_Args&...args)
+{
+}
+```
 
 ----
 # TODO
