@@ -16,9 +16,15 @@
     <Filter Include="LuaClass">
       <UniqueIdentifier>{37c9488e-77f7-477e-a582-b81f6327dc2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LuaHelp">
+      <UniqueIdentifier>{b2884ab3-2549-420a-bfc7-853651fadcf5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
+    <None Include="LuaHelp\ReadMe.md">
+      <Filter>LuaHelp</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,6 +42,9 @@
     <ClCompile Include="LuaClass\TestLua_1.cpp">
       <Filter>LuaClass</Filter>
     </ClCompile>
+    <ClCompile Include="LuaHelp\LuaHelp.cpp">
+      <Filter>LuaHelp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaClass\LuaClass.h">
@@ -43,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="LuaClass\TestLua_1.h">
       <Filter>LuaClass</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaHelp\LuaHelp.h">
+      <Filter>LuaHelp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

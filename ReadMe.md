@@ -95,5 +95,47 @@ Function(_Args&...args)
 序号围殴-1-（N+1)
 
 ----
+# 注册lua函数的五大方法
+![Register](notepic/register.png)
+![Reg2](notepic/reg2.png)
+
+### 1 lua_pushcfunction()
+![Lua Pushcfunction](notepic/lua_pushcfunction.png)
+
+### 2 luaL_newlib
+![Lua L Newlib](notepic/luaL_newlib.png)
+
+luaL_Reg 类型的结构体数组必须以{NULL,NULL}结尾  
+
+注册的函数返回的int类型数字是返回值是个数
+
+![Lua L Newlib 1](notepic/luaL_newlib_1.png)
+###### 调用
+![Lua L Newlib3](notepic/luaL_newlib3.png)
+
+### 3 lua_newtabla + luaL_setfuncs
+改变堆栈
+![Lua Newtable.Png](notepic/lua_newtable.png.png)
+![Lua L Setfuncs](notepic/luaL_setfuncs.png)
+这里就是传入lua_newtable创建的表格中
+
+###### 调用
+![Call1](notepic/call1.png)
+
+### 4 Table注册法
+
+![Table方法调用](notepic/Table方法调用.png)
+lua_rawset 会弹出push的值
+
+### 5 luaL_requiref
+第四个参数是global的意思
+
+
+
+
+
+
+----
+
 # TODO
 [lua嵌入c++教程](https://www.youtube.com/watch?v=xrLQ0OXfjaI&list=PLLwK93hM93Z3nhfJyRRWGRXHaXgNX0Itk)

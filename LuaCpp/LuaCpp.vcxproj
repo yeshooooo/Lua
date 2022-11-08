@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>./;./LuaClass;../src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;./LuaClass;../src;./LuaHelp</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,14 +142,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="LuaHelp\ReadMe.md" />
     <None Include="ReadMe.md" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaClass\LuaClass.cpp" />
-    <ClCompile Include="LuaClass\TestLua_1.cpp" />
+    <ClCompile Include="LuaClass\TestLua_1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="LuaCpp.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="LuaHelp\LuaHelp.cpp" />
     <ClCompile Include="main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -159,7 +163,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaClass\LuaClass.h" />
-    <ClInclude Include="LuaClass\TestLua_1.h" />
+    <ClInclude Include="LuaClass\TestLua_1.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="LuaHelp\LuaHelp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
