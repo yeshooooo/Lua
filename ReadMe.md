@@ -90,6 +90,10 @@ Function(_Args&...args)
 }
 ```
 
+![Temp Multi](notepic/temp_multi.png)
+已知栈顶-1，要获取末尾的N个参数则：
+序号围殴-1-（N+1)
+
 ----
 # TODO
 [lua嵌入c++教程](https://www.youtube.com/watch?v=xrLQ0OXfjaI&list=PLLwK93hM93Z3nhfJyRRWGRXHaXgNX0Itk)

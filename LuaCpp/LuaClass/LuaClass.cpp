@@ -72,7 +72,8 @@ bool LuaClass::dofile(const char* f)
 	{
 		
 		const char* errostr = lua_tostring(m_lua, -1);
-		std::cout << "luaL_dofile: " << errostr << std::endl;
+		//std::cout << "luaL_dofile: " << errostr << std::endl;
+		throw std::logic_error(errostr);
 		lua_pop(m_lua, 1);// 弹出堆栈顶部错误
 		return false;
 	} 
@@ -93,7 +94,8 @@ bool LuaClass::dostring(const char* s)
 	if (luaL_dostring(m_lua, s) != 0)
 	{
 		const char* errostr = lua_tostring(m_lua, -1);
-		std::cout << "luaL_dostring失败: " << errostr << std::endl;
+		//std::cout << "luaL_dostring失败: " << errostr << std::endl;
+		throw std::logic_error(errostr);
 		lua_pop(m_lua, 1);// 弹出堆栈顶部错误
 		return false;
 
@@ -108,7 +110,7 @@ bool LuaClass::GetGlobal(const char* name)
 {
 	if (lua_getglobal(m_lua, name) <= 0)
 	{
-		std::cout << "没有找到全局变量: " << name << std::endl;
+		throw std::logic_error("GetGlobal erro");
 		return false;
 	}
 	std::cout << "找到全局变量: " << name << std::endl;

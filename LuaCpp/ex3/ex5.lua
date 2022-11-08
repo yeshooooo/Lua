@@ -1,4 +1,4 @@
----@diagnostic disable: lowercase-global
+
 
 
 --[[
@@ -22,4 +22,10 @@ end
 function Test1(a,b)
     print("Test1", a,b);
     return a + b;
+end
+
+function Test2(A,B,C)
+    print("Test2 Lua", A,B,C);
+    return 111,"LUA", 333.6;
+    
 end

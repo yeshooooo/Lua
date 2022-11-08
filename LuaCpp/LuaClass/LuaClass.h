@@ -1,7 +1,31 @@
 #pragma once
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 #include "lua.hpp"
+
+union LuaData
+{
+	int IntData;
+	double numberData;
+	char* StrData;
+
+};
+
+//typedef struct __LuaData
+//{
+//	LuaDataTmp data;
+//}LuaData, *PLuaData;
+
+enum LuaType
+{
+	LuaInt = 0,
+	LuaDouble,
+	LuaString
+
+};
+
+
 class LuaClass
 {
 public:
@@ -22,42 +46,66 @@ public:
 	// _________________特化get-----------
 	//定义
 	template<typename _Ty>
-	_Ty LuaGet(int index = -1);
+	_Ty LuaGet(int index = -1, bool _pop = false);
 
 	// 特化字符串类型
 	template<> inline
-	char* LuaGet<char*>(int index) {
+	char* LuaGet<char*>(int index, bool _pop) {
 		if (!LuaCheck<char*>(index))
 		{
-			std::cout << "err check, 检查失败" << std::endl;
+			/*std::cout << "err check, 检查失败" << std::endl;*/
+			throw std::logic_error("err check, 检查失败，抛出自定义异常");
 		}
-		return (char*)lua_tostring(m_lua, index);
+		char* tmp =  (char*)lua_tostring(m_lua, index);
+		if (_pop)
+		{
+			// 
+			lua_remove(m_lua, index);
+		}
+		return tmp;
 	}
 	template<> inline
-	std::string LuaGet<std::string>(int index) {
+	std::string LuaGet<std::string>(int index, bool _pop) {
 		if (!LuaCheck<std::string>(index))
 		{
-			std::cout << "err check, 检查失败" << std::endl;
+			throw std::logic_error("err check, 检查失败，抛出自定义异常");
 		}
 		std::string tmpstr = (char*)lua_tostring(m_lua, index);
+		if (_pop)
+		{
+			// 
+			lua_remove(m_lua, index);
+		}
 		return std::move(tmpstr);
 	}
 	template<> inline
-	int LuaGet<int>(int index) {
+	int LuaGet<int>(int index, bool _pop) {
 		if (!LuaCheck<int>(index))
 		{
 			//std::cout << "err check, 检查失败" << std::endl;
-			throw std::logic_error("erro check!");
+			throw std::logic_error("err check, 检查失败，抛出自定义异常");
 		}
-		return lua_tonumber(m_lua, index);
+		int tmp = lua_tonumber(m_lua, index);
+		if (_pop)
+		{
+			// 
+			lua_remove(m_lua, index);
+		}
+		return tmp;
 	}
 	template<> inline
-	double LuaGet<double>(int index) {
+	double LuaGet<double>(int index, bool _pop) {
 		if (!LuaCheck<double>(index))
 		{
-			std::cout << "err check, 检查失败" << std::endl;
+			throw std::logic_error("err check, 检查失败，抛出自定义异常");
 		}
-		return lua_tonumber(m_lua, index);
+		double tmp = lua_tonumber(m_lua, index);
+		if (_pop)
+		{
+			// 
+			lua_remove(m_lua, index);
+		}
+		return tmp;
 	}
 	// _________________特化check-----------
 	//定义
@@ -86,6 +134,10 @@ public:
 	void LuaPush(_TY);
 
 	template<> void LuaPush<char*>(char* t) {
+		lua_pushstring(m_lua, t);
+	}
+
+	template<> void LuaPush<const char*>(const char* t) {
 		lua_pushstring(m_lua, t);
 	}
 
@@ -267,55 +319,30 @@ public:
 //#endif
 	////////////////////////////////调用Lua函数模板//////////////////////////////////////////
 
-	inline void CallLua(int& argSize)//压入无参数
+	inline void __CallLua(int& argSize)//压入无参数
 	{
-		std::cout << "VOID" << std::endl;
+		//std::cout << "VOID" << std::endl;
 	}
 
 	template<typename _FirstArg, typename... _Args>
-	void CallLua(int& argSize, _FirstArg arg1, _Args...args)//压入参数
+	void __CallLua(int& argSize, _FirstArg arg1, _Args...args)//压入参数
 	{
-		std::cout << "push" << std::endl;
+		//std::cout << "push" << std::endl;
 		argSize++;
 		LuaPush<_FirstArg>(arg1);
-		CallLua(argSize, args...);
+		__CallLua(argSize, args...);
 	}
 
 	template<typename _Ret, typename... _Args>
-	_Ret CallLuaFunction(char* FunctionName, _Args...args)
+	_Ret OneCallLuaFunction(char* FunctionName, _Args...args)
 	{
-
+		
 		if (GetGlobal(FunctionName))
 		{
 			int argSize = 0;//参数个数
-			CallLua(argSize, args...);
+			__CallLua(argSize, args...);
 			PrintStack();
-			std::cout << "参数个数:" << argSize << std::endl;
-			if (lua_pcall(m_lua, argSize, 1, 0) != 0)
-			{
-				lua_pop(GetLuaState(), 1);//弹出错误值 
-				throw std::logic_error("lua_pcall erro");
-			}
-			_Ret t = LuaGet<_Ret>();
-			return t;
-
-		}
-
-
-
-		return _Ret();
-	}
-
-
-	template<typename _Ret, typename... _Args>
-	_Ret CallLuaFuctionPop(char* FunctionName, _Args...args)
-	{
-		if (GetGlobal(FunctionName))
-		{
-			int argSize = 0;//参数个数
-			CallLua(argSize, args...);
-			PrintStack();
-			cout << "参数个数:" << argSize << endl;
+			//std::cout << "参数个数:" << argSize << std::endl;
 			if (lua_pcall(m_lua, argSize, 1, 0) != 0)
 			{
 				lua_pop(GetLuaState(), 1);//弹出错误值 
@@ -325,13 +352,137 @@ public:
 			lua_pop(m_lua, 1);
 			return t;
 
-
 		}
 
 
 
 		return _Ret();
 	}
+
+
+	//template<typename _Ret, typename... _Args>
+	//_Ret CallLuaFuctionPop(char* FunctionName, _Args...args)
+	//{
+	//	if (GetGlobal(FunctionName))
+	//	{
+	//		int argSize = 0;//参数个数
+	//		CallLua(argSize, args...);
+	//		PrintStack();
+	//		//cout << "参数个数:" << argSize << endl;
+	//		if (lua_pcall(m_lua, argSize, 1, 0) != 0)
+	//		{
+	//			lua_pop(GetLuaState(), 1);//弹出错误值 
+	//			throw std::logic_error("lua_pcall erro");
+	//		}
+	//		_Ret t = LuaGet<_Ret>();
+	//		lua_pop(m_lua, 1);
+	//		return t;
+
+
+	//	}
+
+
+
+	//	return _Ret();
+	//}
+
+/// <summary>
+/// 无参数CALL
+/// </summary>
+
+	template<typename... _Args>
+	LuaClass& VoidCallLuaFunction(char* FunctionName, _Args...args)
+	{
+
+		if (GetGlobal(FunctionName))
+		{
+			int argSize = 0;//参数个数
+			__CallLua(argSize, args...);
+			PrintStack();
+			//std::cout << "参数个数:" << argSize << std::endl;
+			if (lua_pcall(m_lua, sizeof...(args), 0, 0) != 0) //这里强制把返回值写为0，即lua里即使有返回值，我们也不接受
+			{
+				lua_pop(GetLuaState(), 1);//弹出错误值 
+				throw std::logic_error("GetGlobal erro");
+			}
+			return *this;
+
+
+		}
+		throw std::logic_error("AutoCallLuaFunction GetGlobal erro");
+
+	}
+
+	/// <summary>
+	/// 自动CALL
+	/// </summary>
+	/// <typeparam name="..._Args"></typeparam>
+	/// <param name="FunctionName"></param>
+	/// <param name="...args"></param>
+	/// <returns></returns>
+	template<typename... _Args>
+	LuaClass& AutoCallLuaFunction(char* FunctionName, _Args...args)
+	{
+
+		if (GetGlobal(FunctionName))
+		{
+			int argSize = 0;//参数个数
+			__CallLua(argSize, args...);
+			PrintStack();
+			//std::cout << "参数个数:" << argSize << std::endl;
+			if (lua_pcall(m_lua, sizeof...(args), -1, 0) != 0) //这里强制把返回值写为0，即lua里即使有返回值，我们也不接受
+			{
+				lua_pop(GetLuaState(), 1);//弹出错误值 
+				throw std::logic_error("GetGlobal erro");
+			}
+			return *this;
+
+
+		}
+		throw std::logic_error("AutoCallLuaFunction GetGlobal erro");
+
+	}
+
+
+	// -------------------------获取多返回值-------------
+	template<typename... _Args>
+	std::vector<LuaData> GetResult(_Args...args)
+	{
+		int _argsize = sizeof...(args); // 这里的_argsize可以用于计算，不能用于数组初始化
+		int argarray[sizeof...(args)] = { args... };
+		std::cout << _argsize << std::endl;
+		std::vector<LuaData> __array = {};
+		int __index = -_argsize + 1;
+		for (auto v: argarray)
+		{
+			LuaData temp = { 0 };
+			std::cout << "v: " << v << std::endl;
+			switch (v)
+			{
+			case LuaType::LuaInt:
+				temp.IntData = LuaGet<int>(-1 + __index);
+				__array.push_back(temp);
+				break;
+			case LuaType::LuaDouble:
+				temp.numberData = LuaGet<double>(-1 + __index);
+				__array.push_back(temp);
+				break;
+			case LuaType::LuaString:
+				temp.StrData =  LuaGet<char*>(-1 + __index);
+				__array.push_back(temp);
+				break;
+			default:
+				throw std::logic_error("无法获取返回值，未知的类型");
+				break;
+			}
+			__index++;
+		}
+
+		lua_pop(m_lua, _argsize);
+		return __array;
+	}
+
+
 public:
 	inline lua_State* LuaClass::GetLuaState()
 	{

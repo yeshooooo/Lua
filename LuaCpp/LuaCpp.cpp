@@ -130,10 +130,30 @@ int main_1()
 
 int main() {
 	TestLua_1* mclass = new TestLua_1();
-	if (mclass->CreateLuaState())
-	{
-		mclass->dofile("./ex3/ex5.lua");
-		int ret =  mclass->CallLuaFunction<int>("Test1",1, 9);
-		std::cout << "Lua return: " << ret << std::endl;
+	try {
+		if (mclass->CreateLuaState())
+		{
+			mclass->dofile("./ex3/ex5.lua");
+			//mclass->AutoCallLuaFunction("Test2", 1, "ABC",999);
+			//auto ret =  mclass->AutoCallLuaFunction("Test2", 1, "ABC",999).GetResult(LuaInt, LuaString, LuaDouble);
+			//std::cout << ret[0].IntData << std::endl;
+			//std::cout << ret[1].StrData << std::endl;
+			//std::cout << ret[2].numberData << std::endl;
+
+
+			auto ret = mclass->AutoCallLuaFunction("Test2", 1, "ABC", 999);
+			std::cout << mclass->LuaGet<int>(1,true) << std::endl;
+			std::cout << mclass->LuaGet<char*>(1, true) << std::endl;
+			std::cout << mclass->LuaGet<double>(1, true) << std::endl;
+			mclass->PrintStack();
+			
+		}
+
 	}
+	catch (std::logic_error& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+
+
 }
